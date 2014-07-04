@@ -30,7 +30,7 @@ import com.bole.resumeparser.models.ResumeInformation;
 import com.bole.resumeparser.models.TextResumeData;
 
 @RestController
-@RequestMapping("/resume/parse")
+@RequestMapping("/resumeparse/")
 public class HelloWorldController {
 //@RequestMapping(value = "/{name}", method = RequestMethod.GET)
 // public String getGreeting(@PathVariable String name) {
@@ -38,7 +38,7 @@ public class HelloWorldController {
 //  return result;
 // }
 
-@RequestMapping(value = "/start", method = RequestMethod.POST)
+@RequestMapping(value = "/start", method = RequestMethod.POST,headers="Accept=application/json")
 @ResponseBody
 public String getPerson(@ModelAttribute ResumeInformation resumeInfo) throws ResumeParseException, JsonGenerationException, JsonMappingException, IOException {
 	String text = resumeInfo.getText();
