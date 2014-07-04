@@ -32,71 +32,74 @@ import com.bole.resumeparser.models.TextResumeData;
 @RestController
 @RequestMapping("/resumeparse/")
 public class HelloWorldController {
-//@RequestMapping(value = "/{name}", method = RequestMethod.GET)
-// public String getGreeting(@PathVariable String name) {
-//  String result="Hello "+name;  
-//  return result;
-// }
 
 @RequestMapping(value = "/start", method = RequestMethod.POST,headers="Accept=application/json")
 @ResponseBody
 public String getPerson(@ModelAttribute ResumeInformation resumeInfo) throws ResumeParseException, JsonGenerationException, JsonMappingException, IOException {
-	String text = resumeInfo.getText();
-	text = new String(text.getBytes("ISO-8859-1"),"utf-8");
-	String source = resumeInfo.getSource();
-	String type = resumeInfo.getType();
-	
-	HtmlResumeParserInterface parser = null;
-	ResumeData re=new ResumeData();
-	
-	String jsonValue = "";
-	
-	if("html".equals(type)){
-		switch(source){
-		case "zhilian":
-			parser = new ZhiLianResumeParser(text,"","");            		
-			break;
-		case "51job":
-			parser=new _51jobResumeParser(text,"",null);
-			break;
-		case "liepin":
-			parser = new LiePinResumeParser(text,"",null); 
-			break;
-		}
-		re=parser.parse();
+	try{
+		String text = resumeInfo.getText();
+		text = new String(text.getBytes("ISO-8859-1"),"utf-8");
+		String source = resumeInfo.getSource();
+		String type = resumeInfo.getType();
 		
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.getSerializationConfig().setSerializationInclusion(Inclusion.NON_NULL);
-		jsonValue = mapper.writeValueAsString(re);
-//    	jsonValue = jsonValue.replaceAll("\"_id\":\\{.*?\\}", "\"id\":\""+re.get_id().toString()+"\"");
-	}else if("text".equals(type)){
-		DocumentResumeParserInterface docparser = null;
-		TextResumeData textre = new TextResumeData();
+		HtmlResumeParserInterface parser = null;
+		ResumeData re=new ResumeData();
 		
-		ArrayList<String> resumeContentList = new ArrayList<String>();
-		String[] lines = text.split(System.getProperty("line.separator"));
-		for(int i=0;i<lines.length;i++){
-			resumeContentList.add(lines[i]);
-		}
-		switch(source){
-		case "zhilian":
-			docparser = new com.bole.resumeparser.document.impl.ZhiLianResumeParser(resumeContentList);
-			break;
-		case "51job":
-			docparser = new com.bole.resumeparser.document.impl._51jobResumeParser(resumeContentList);
-			break;
-		default:
-			docparser = new com.bole.resumeparser.document.impl.TextResumeParser(resumeContentList);
-			break;
-		}
-		textre=docparser.parse();
+		String jsonValue = "";
 		
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.getSerializationConfig().setSerializationInclusion(Inclusion.NON_NULL);
-		jsonValue = mapper.writeValueAsString(textre);
+		if("html".equals(type)){
+			switch(source){
+			case "zhilian":
+				parser = new ZhiLianResumeParser(text,"","");            		
+				break;
+			case "51job":
+				parser=new _51jobResumeParser(text,"","");
+				break;
+			case "liepin":
+				parser = new LiePinResumeParser(text,"",""); 
+				break;
+			}
+			re=parser.parse();
+			
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.getSerializationConfig().setSerializationInclusion(Inclusion.NON_NULL);
+			jsonValue = mapper.writeValueAsString(re);
+//	    	jsonValue = jsonValue.replaceAll("\"_id\":\\{.*?\\}", "\"id\":\""+re.get_id().toString()+"\"");
+		}else{
+			DocumentResumeParserInterface docparser = null;
+			TextResumeData textre = new TextResumeData();
+			
+			ArrayList<String> resumeContentList = new ArrayList<String>();
+			String[] lines = text.split(System.getProperty("line.separator"));
+			for(int i=0;i<lines.length;i++){
+				resumeContentList.add(lines[i]);
+			}
+			switch(source){
+			case "zhilian":
+				docparser = new com.bole.resumeparser.document.impl.ZhiLianResumeParser(resumeContentList);
+				break;
+			case "51job":
+				docparser = new com.bole.resumeparser.document.impl._51jobResumeParser(resumeContentList);
+				break;
+			case "liepin":
+				docparser = new com.bole.resumeparser.document.impl.LiepinResumeParser(resumeContentList);
+				break;
+			default:
+				docparser = new com.bole.resumeparser.document.impl.TextResumeParser(resumeContentList);
+				break;
+			}
+			textre=docparser.parse();
+			
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.getSerializationConfig().setSerializationInclusion(Inclusion.NON_NULL);
+			jsonValue = mapper.writeValueAsString(textre);
+		}
+		String response = new String(jsonValue.getBytes("utf-8"),"ISO-8859-1");
+		String result=response;
+		return result;
+	}catch(Exception e){
+		return "{\"status\":\"failed\"}";
 	}
-	String response = new String(jsonValue.getBytes("utf-8"),"ISO-8859-1");
-	String result=response;
-	return result;
+	
 }
 }
