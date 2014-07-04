@@ -857,7 +857,7 @@ public class LiepinResumeParser extends AbstractResumeParser implements Document
 	
 	public void processContactInfo(int start,int end){
 		for(int i = start;i <= end; i++){
-			String line = resumeContentList.get(i).replaceAll(":", " ").replaceAll(" ", "").trim();
+			String line = resumeContentList.get(i).replaceAll(":", " ").replaceAll("：", "").replaceAll(" ", "").trim();
 			if(line.equals("")){
 				continue;
 			}else{

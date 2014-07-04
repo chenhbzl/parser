@@ -72,7 +72,10 @@ public String getPerson(@ModelAttribute ResumeInformation resumeInfo) throws Res
 			ArrayList<String> resumeContentList = new ArrayList<String>();
 			String[] lines = text.split(System.getProperty("line.separator"));
 			for(int i=0;i<lines.length;i++){
-				resumeContentList.add(lines[i]);
+				String line = lines[i];
+				line = line.replaceAll("\u00A0", " ").replaceAll("\u3000", " ").trim();
+	        	line = line.replaceAll("：", ":");
+				resumeContentList.add(line);
 			}
 			switch(source){
 			case "zhilian":
